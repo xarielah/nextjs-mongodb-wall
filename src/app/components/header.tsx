@@ -1,13 +1,28 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { CiLogin, CiLogout } from "react-icons/ci";
 
 export default function Header() {
   const { data: session } = useSession();
   const loggedIn = session && session?.user;
+  const pathname = usePathname();
+  console.log("🚀 ~ Header ~ pathname:", pathname);
 
   return (
-    <header className="container-bg flex justify-end">
+    <header
+      className={`container-bg flex items-center ${
+        pathname === "/" ? "justify-end" : "justify-between"
+      }`}
+    >
+      {pathname !== "/" ? (
+        <Link href="/" className="text-sm text-zinc-500">
+          ← Go to your wall
+        </Link>
+      ) : (
+        ""
+      )}
       {loggedIn ? (
         <div className="flex items-center gap-4">
           <ShowUser user={session?.user} />

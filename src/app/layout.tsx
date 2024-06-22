@@ -20,7 +20,10 @@ export default function RootLayout({
     <SessionWrapper>
       <html lang="en">
         <body
-          className={font.className + " bg-zinc-900 text-white min-h-screen"}
+          className={
+            font.className +
+            " bg-zinc-900 text-white min-h-screen px-2 md:px-4 lg:px-0"
+          }
         >
           <div className="w-full max-w-3xl space-y-10 pt-16 flex flex-col mx-auto">
             <Header />
