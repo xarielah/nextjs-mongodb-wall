@@ -27,7 +27,7 @@ export default function WallNotes({
   const deletePost = (id: string) => {
     const oldContent = [...data];
     removeNoteFromWall(id);
-    fetch(`/api/wall/${id}asd`, { method: "DELETE" })
+    fetch(`/api/wall/${id}`, { method: "DELETE" })
       .then((res) => {
         if (!res.ok) {
           // reset back content;
