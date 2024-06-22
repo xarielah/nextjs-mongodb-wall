@@ -23,7 +23,10 @@ async function newPost(req: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    return NextResponse.error().json();
+    return NextResponse.json(
+      { message: "Error creating post" },
+      { status: 500 }
+    );
   }
 }
 
@@ -31,14 +34,19 @@ async function getPosts(req: NextRequest) {
   try {
     const authorId = req.headers.get("x-middleware-userid");
 
+    await connectMongo();
     const posts = await Post.find({ author: authorId }).sort({ createdAt: -1 });
 
-    return NextResponse.json(
-      { data: posts, count: posts ? posts.length : 0 },
-      { status: !posts || posts.length === 0 ? 204 : 200 }
-    );
+    const postsDataResponse = { data: posts, count: posts ? posts.length : 0 };
+
+    return NextResponse.json(postsDataResponse, {
+      status: 200,
+    });
   } catch (error) {
-    return NextResponse.error().json();
+    return NextResponse.json(
+      { message: "Error fetching posts" },
+      { status: 500 }
+    );
   }
 }
 
