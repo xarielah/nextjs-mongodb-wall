@@ -1,5 +1,14 @@
 "use client";
-export default function UserWallPage({ wallId }: { wallId: string }) {
+
+interface UserWallPage {
+  wallId: string;
+}
+
+export default function UserWallPage({
+  params: { wallId },
+}: {
+  params: { wallId: string };
+}) {
   console.log("🚀 ~ UserWallPage ~ wallId:", wallId);
   return (
     <div className="container-bg text-center text-zinc-500">
