@@ -6,16 +6,6 @@ import clientPromise from "./db";
 export const authOptions: AuthOptions = {
   adapter: MongoDBAdapter(clientPromise) as any,
 
-  cookies: {
-    sessionToken: {
-      name: "next-auth.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-      },
-    },
-  },
-
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
