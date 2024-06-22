@@ -1,29 +1,43 @@
+import Image from "next/image";
 import EmptyNotes from "./empty-notes";
-type PostType = {
+
+export type PostType = {
   content: string;
   isPublic: boolean;
   createdAt: string;
   _id: string;
+  isRtl: boolean;
 };
 
 interface IWallNotes {
   data: PostType[];
   removeNoteFromWall: (id: string) => void;
+  setWallNotes: (notes: PostType[]) => void;
   user: { name: string | null | undefined; image: string | null | undefined };
 }
 
 export default function WallNotes({
   removeNoteFromWall,
+  setWallNotes,
   data,
   user,
 }: IWallNotes) {
   if (data.length === 0) return <EmptyNotes />;
 
   const deletePost = (id: string) => {
+    const oldContent = [...data];
     removeNoteFromWall(id);
-    fetch(`/api/wall/${id}`, { method: "DELETE" }).then((res) =>
-      console.log(res)
-    );
+    fetch(`/api/wall/${id}asd`, { method: "DELETE" })
+      .then((res) => {
+        if (!res.ok) {
+          // reset back content;
+          setWallNotes(oldContent);
+        }
+      })
+      .catch(() => {
+        // reset back content;
+        setWallNotes(oldContent);
+      });
   };
   return (
     <>
@@ -33,7 +47,9 @@ export default function WallNotes({
             <div className="flex justify-between mb-3">
               <div className="flex gap-2 items-center">
                 {user.image ? (
-                  <img
+                  <Image
+                    width={32}
+                    height={32}
                     src={user.image}
                     alt={user.name || "N/A"}
                     className="w-8 h-8 rounded-full"
@@ -52,7 +68,12 @@ export default function WallNotes({
                 </p>
               </div>
             </div>
-            <p className="p-3 bg-zinc-950/20 rounded-md whitespace-pre-line">
+            <p
+              className={`p-3 bg-zinc-950/20 rounded-md whitespace-pre-line ${
+                note.isRtl ? "text-right" : ""
+              }`}
+              style={{ direction: note.isRtl ? "rtl" : "ltr" }}
+            >
               {note.content}
             </p>
           </article>

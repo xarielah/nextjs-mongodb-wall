@@ -12,6 +12,11 @@ export default function AddNote({
 
   const [text, setText] = useState<string>("");
   const [isPublic, setIsPublic] = useState<boolean>(false);
+  const [direction, setDirection] = useState<"ltr" | "rtl">("ltr");
+
+  const toggleDirection = () => {
+    setDirection(direction === "ltr" ? "rtl" : "ltr");
+  };
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -35,6 +40,7 @@ export default function AddNote({
       body: JSON.stringify({
         content: content,
         isPublic: isPublic,
+        isRtl: direction === "rtl",
       }),
     })
       .then(async (res) => {
@@ -50,6 +56,7 @@ export default function AddNote({
             createdAt: new Date().toISOString(),
             content: content,
             isPublic: isPublic,
+            isRtl: direction === "rtl",
             _id: response.postId.toString(),
           };
 
@@ -73,17 +80,28 @@ export default function AddNote({
       <textarea
         value={text}
         onChange={handleChange}
-        className="input"
+        style={{ direction: direction }}
+        className={`input ${direction === "rtl" ? "text-right " : ""}`}
         placeholder="Add what you need."
       />
-      <button
-        className="button px-4 text-sm"
-        onClick={handleSubmit}
-        type="submit"
-        disabled={loading || text.trim().length === 0}
-      >
-        {loading ? "Writing to wall..." : "Pin on the wall"}
-      </button>
+      <div className="flex justify-between items-center w-full">
+        <menu className="flex items-center gap-6 text-zinc-300">
+          <li role="button" onClick={togglePrivacy}>
+            {isPublic ? "PUBLIC" : "PRIVATE"}
+          </li>
+          <li role="button" onClick={toggleDirection}>
+            {direction.toUpperCase()}
+          </li>
+        </menu>
+        <button
+          className="button px-4 text-sm"
+          onClick={handleSubmit}
+          type="submit"
+          disabled={loading || text.trim().length === 0}
+        >
+          {loading ? "Writing to wall..." : "Pin on the wall"}
+        </button>
+      </div>
     </div>
   );
 }

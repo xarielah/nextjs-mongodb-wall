@@ -9,11 +9,12 @@ async function newPost(req: NextRequest) {
 
     await connectMongo();
 
-    const { content, isPublic } = body;
+    const { content, isPublic, isRtl } = body;
     const newPostData = {
       content: content,
       isPublic: typeof isPublic === "boolean" ? isPublic : false,
       author: authorId || "",
+      isRtl: typeof isRtl === "boolean" ? isRtl : false,
     };
 
     const newPost = await Post.create(newPostData);

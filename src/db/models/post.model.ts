@@ -18,6 +18,10 @@ const PostSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isRtl: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

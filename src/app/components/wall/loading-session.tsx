@@ -1,9 +1,9 @@
-import { AiOutlineLoading } from "react-icons/ai";
+import Spinner from "../spinner";
 
 export default function LoadingSession() {
   return (
     <div className="w-full flex items-center justify-center text-2xl">
-      <AiOutlineLoading className="animate-spin" />
+      <Spinner />
     </div>
   );
 }
