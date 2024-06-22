@@ -16,8 +16,6 @@ export default async function middleware(request: NextRequest) {
      * next-auth likes to use different cookie name for prod (https) so make sure to set a consistent cookie name in your next-auth configuration file (see docs)
      */
     if (!c.get("next-auth.session-token")?.value?.trim()) {
-      if (request.method === "GET")
-        return NextResponse.redirect(request.nextUrl.origin, { status: 302 });
       return NextResponse.json(
         { message: "Unauthorized, log in first" },
         { status: 401 }
