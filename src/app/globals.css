@@ -2,32 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+.container-bg {
+  @apply bg-zinc-950/20 p-4 w-full;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.input {
+  @apply bg-zinc-950/20 py-2 px-4 w-full focus:outline-[1px] focus:outline-zinc-800;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+.button {
+  @apply bg-zinc-950/20 py-2 px-6 w-max duration-300 hover:bg-zinc-950/40 font-bold disabled:text-zinc-500 disabled:cursor-not-allowed disabled:bg-zinc-700/20;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.form-label {
+  @apply flex flex-col gap-2 w-full;
 }

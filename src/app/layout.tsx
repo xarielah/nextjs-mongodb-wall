@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Header from "./components/header";
+import SessionWrapper from "./components/session-wrapper/session-wrapper";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -15,8 +17,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <body
+          className={inter.className + " bg-zinc-900 text-white min-h-screen"}
+        >
+          <div className="w-full max-w-3xl space-y-10 pt-16 flex flex-col mx-auto">
+            <Header />
+            {children}
+            <footer className="container-bg text-sm">Test &copy;</footer>
+          </div>
+        </body>
+      </html>
+    </SessionWrapper>
   );
 }
