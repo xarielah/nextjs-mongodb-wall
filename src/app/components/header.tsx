@@ -1,9 +1,9 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { CiLogin, CiLogout } from "react-icons/ci";
 
 export default function Header() {
   const { data: session } = useSession();
-  console.log("🚀 ~ Header ~ session:", session);
   const loggedIn = session && session?.user;
 
   return (
@@ -11,13 +11,17 @@ export default function Header() {
       {loggedIn ? (
         <div className="flex items-center gap-4">
           <ShowUser user={session?.user} />
-          <button onClick={() => signOut()}>Logout</button>
+          <button className="text-xl" onClick={() => signOut()}>
+            <CiLogout />
+          </button>
         </div>
       ) : (
         ""
       )}
       {!loggedIn ? (
-        <button onClick={() => signIn("google")}>Google Login</button>
+        <button className="text-xl" onClick={() => signIn("google")}>
+          <CiLogin />
+        </button>
       ) : (
         ""
       )}
@@ -26,7 +30,6 @@ export default function Header() {
 }
 
 function ShowUser({ user }: any) {
-  console.log("🚀 ~ ShowUser ~ user:", user);
   return (
     <div className="flex items-center gap-3">
       <img className="w-8 h-8 rounded-full" src={user.image} alt={user.name} />

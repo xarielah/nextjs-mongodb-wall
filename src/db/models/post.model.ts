@@ -14,6 +14,10 @@ const PostSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

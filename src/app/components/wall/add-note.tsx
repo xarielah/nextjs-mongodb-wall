@@ -8,9 +8,12 @@ export default function AddNote({
 }: {
   addNoteToWall: (note: any) => void;
 }) {
+  const { data: session } = useSession();
+
   const [text, setText] = useState<string>("");
   const [isPublic, setIsPublic] = useState<boolean>(false);
-  const { data: session } = useSession();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(event.target.value);
@@ -21,7 +24,11 @@ export default function AddNote({
   };
 
   const handleSubmit = () => {
+    setLoading(true);
+
     const content = text.toString().trim();
+    const oldContent = text;
+    setText("");
 
     fetch("/api/wall", {
       method: "POST",
@@ -29,18 +36,36 @@ export default function AddNote({
         content: content,
         isPublic: isPublic,
       }),
-    }).then((res) => {
-      console.log(res);
-      const wallPost = {
-        author: session?.user?.name || "N/A",
-        createdAt: new Date().toISOString(),
-        content: content,
-        isPublic: isPublic,
-      };
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          console.error("Failed to add note to wall");
+          return;
+        }
 
-      addNoteToWall(wallPost);
-      setText("");
-    });
+        if (res.ok) {
+          const response = await res.json();
+          const wallPost = {
+            author: session?.user?.name || "N/A",
+            createdAt: new Date().toISOString(),
+            content: content,
+            isPublic: isPublic,
+            _id: response.postId.toString(),
+          };
+
+          addNoteToWall(wallPost);
+        } else {
+          // We dont want the user to lost their content if the request fails
+          setText(oldContent);
+        }
+      })
+      .catch(() => {
+        // We dont want the user to lost their content if the request fails
+        setText(oldContent);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
@@ -55,8 +80,9 @@ export default function AddNote({
         className="button px-4 text-sm"
         onClick={handleSubmit}
         type="submit"
+        disabled={loading || text.trim().length === 0}
       >
-        Pin on the wall
+        {loading ? "Writing to wall..." : "Pin on the wall"}
       </button>
     </div>
   );

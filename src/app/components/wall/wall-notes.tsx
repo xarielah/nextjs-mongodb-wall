@@ -3,15 +3,28 @@ type PostType = {
   content: string;
   isPublic: boolean;
   createdAt: string;
+  _id: string;
 };
 
 interface IWallNotes {
   data: PostType[];
+  removeNoteFromWall: (id: string) => void;
   user: { name: string | null | undefined; image: string | null | undefined };
 }
 
-export default function WallNotes({ data, user }: IWallNotes) {
+export default function WallNotes({
+  removeNoteFromWall,
+  data,
+  user,
+}: IWallNotes) {
   if (data.length === 0) return <EmptyNotes />;
+
+  const deletePost = (id: string) => {
+    removeNoteFromWall(id);
+    fetch(`/api/wall/${id}`, { method: "DELETE" }).then((res) =>
+      console.log(res)
+    );
+  };
   return (
     <>
       {data.map((note, index) => (
@@ -46,7 +59,12 @@ export default function WallNotes({ data, user }: IWallNotes) {
           <aside className="bg-zinc-950/10 px-4 text-sm py-1 text-zinc-400 rounded-br-xl rounded-bl-xl">
             <menu className="flex gap-3 justify-end">
               <li>
-                <button className="hover:underline">Delete</button>
+                <button
+                  className="hover:underline"
+                  onClick={() => deletePost(note._id)}
+                >
+                  Delete
+                </button>
               </li>
             </menu>
           </aside>

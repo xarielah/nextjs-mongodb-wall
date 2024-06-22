@@ -2,6 +2,8 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import AddNote from "./components/wall/add-note";
+import LoadingSession from "./components/wall/loading-session";
+import NotLoggedIn from "./components/wall/not-logged-in";
 import WallNotes from "./components/wall/wall-notes";
 
 export default function Home() {
@@ -31,18 +33,21 @@ export default function Home() {
     setWallNotes((prev: any) => [note, ...prev]);
   };
 
+  const removeNoteFromWall = (id: string) => {
+    setWallNotes((prev: any) => prev.filter((note: any) => note._id !== id));
+  };
+
+  if (loadingSession) return <LoadingSession />;
+  if (!loggedIn) return <NotLoggedIn />;
   return (
     <main className="space-y-4">
-      {!loggedIn ? "" : <AddNote addNoteToWall={addNoteToWall} />}
+      <AddNote addNoteToWall={addNoteToWall} />
       <section className="p-2 w-full space-y-6">
-        {!loggedIn ? (
-          "Not logged in"
-        ) : (
-          <WallNotes
-            data={wallNotes}
-            user={{ name: session.user?.name, image: session.user?.image }}
-          />
-        )}
+        <WallNotes
+          data={wallNotes}
+          removeNoteFromWall={(id: string) => removeNoteFromWall(id)}
+          user={{ name: session.user?.name, image: session.user?.image }}
+        />
       </section>
     </main>
   );
