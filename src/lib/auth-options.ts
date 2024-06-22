@@ -1,9 +1,20 @@
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import { AuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import clientPromise from "./db";
 
-export const authOptions = {
-  adapter: MongoDBAdapter(clientPromise),
+export const authOptions: AuthOptions = {
+  adapter: MongoDBAdapter(clientPromise) as any,
+
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+      },
+    },
+  },
 
   providers: [
     GoogleProvider({
@@ -31,4 +42,4 @@ export const authOptions = {
       return session;
     },
   },
-} as any;
+};
