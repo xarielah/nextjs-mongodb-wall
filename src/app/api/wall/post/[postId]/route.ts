@@ -30,7 +30,6 @@ async function deletePost(
       { status: 200 }
     );
   } catch (error) {
-    console.log("🚀 ~ error:", error);
     return NextResponse.json(
       { message: "Error deleting post" },
       { status: 500 }

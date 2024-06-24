@@ -1,25 +1,33 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CiLogin, CiLogout } from "react-icons/ci";
+import { PiGearSix } from "react-icons/pi";
+import { CopyButton } from "./copy-button";
 
 export default function Header() {
   const { data: session } = useSession();
   const loggedIn = session && session?.user;
   const pathname = usePathname();
-  console.log("🚀 ~ Header ~ pathname:", pathname);
 
   return (
     <header
       className={`container-bg flex items-center ${
-        pathname === "/" ? "justify-end" : "justify-between"
+        session ? "justify-between" : "justify-end"
       }`}
     >
       {pathname !== "/" ? (
         <Link href="/" className="text-sm text-zinc-500">
           ← Go to your wall
         </Link>
+      ) : (
+        ""
+      )}
+
+      {pathname === "/" && session ? (
+        <OptionsForLoggedUsers wallId={(session?.user as any)?.wallId || ""} />
       ) : (
         ""
       )}
@@ -44,10 +52,32 @@ export default function Header() {
   );
 }
 
+function OptionsForLoggedUsers({ wallId }: { wallId: string }) {
+  const windowLoc = window ? window.location.origin : "";
+  return (
+    <menu className="text-zinc-500 text-2xl flex items-center gap-6">
+      <li role="button" className="hover-white-element">
+        <Link href="/wall/settings">
+          <PiGearSix />
+        </Link>
+      </li>
+      <li role="button" className="text-xl hover-white-element">
+        <CopyButton stringToCopy={`${windowLoc}/wall/${wallId}`} />
+      </li>
+    </menu>
+  );
+}
+
 function ShowUser({ user }: any) {
   return (
     <div className="flex items-center gap-3">
-      <img className="w-8 h-8 rounded-full" src={user.image} alt={user.name} />
+      <Image
+        width={32}
+        height={32}
+        className="w-8 h-8 rounded-full"
+        src={user.image}
+        alt={user.name}
+      />
       <span>{user.name}</span>
     </div>
   );

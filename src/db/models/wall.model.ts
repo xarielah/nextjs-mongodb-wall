@@ -3,6 +3,7 @@ import { Schema, model, models } from "mongoose";
 const WallSchema = new Schema(
   {
     user: {
+      unique: true,
       type: Schema.Types.ObjectId,
       ref: "User",
     },

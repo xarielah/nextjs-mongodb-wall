@@ -49,7 +49,6 @@ export default function Home() {
           setWallNotes={(notes: PostType[]) => setWallNotes(notes)}
           data={wallNotes}
           removeNoteFromWall={(id: string) => removeNoteFromWall(id)}
-          user={{ name: session.user?.name, image: session.user?.image }}
         />
       </section>
     </main>

@@ -45,7 +45,9 @@ export default async function middleware(request: NextRequest) {
       const session = await response.json();
       if (typeof session === "object") {
         const id = session?.user?.id;
+        const email = session?.user?.email;
         newHeaders.set("x-middleware-userid", id);
+        newHeaders.set("x-middleware-useremail", email);
       }
 
       return NextResponse.next({

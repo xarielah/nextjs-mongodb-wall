@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { FaLock, FaLockOpen, FaLongArrowAltRight } from "react-icons/fa";
 
 export default function AddNote({
   addNoteToWall,
@@ -85,11 +86,34 @@ export default function AddNote({
         placeholder="Add what you need."
       />
       <div className="flex justify-between items-center w-full">
-        <menu className="flex items-center gap-6 text-zinc-300">
-          <li role="button" onClick={togglePrivacy}>
-            {isPublic ? "PUBLIC" : "PRIVATE"}
+        <menu className="flex items-center gap-6 text-zinc-300 text-sm">
+          <li
+            role="button"
+            onClick={togglePrivacy}
+            className="hover-white-element button"
+          >
+            {isPublic ? (
+              <span className="flex items-center gap-2 text-green-400">
+                <FaLockOpen className="text-sm" />
+                PUBLIC
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <FaLock className="text-sm" />
+                PRIVATE
+              </span>
+            )}
           </li>
-          <li role="button" onClick={toggleDirection}>
+          <li
+            role="button"
+            onClick={toggleDirection}
+            className="hover-white-element button flex items-center gap-2"
+          >
+            <FaLongArrowAltRight
+              className={`text-sm ease-in-out duration-300 ${
+                direction === "ltr" ? "" : "rotate-180"
+              }`}
+            />
             {direction.toUpperCase()}
           </li>
         </menu>
