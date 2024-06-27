@@ -37,7 +37,7 @@ async function getPosts(req: NextRequest) {
     const authorId = req.headers.get("x-middleware-userid");
 
     await connectMongo();
-    // const posts = await Post.find({ author: authorId }).sort({ createdAt: -1 });
+
     const posts = await Post.aggregate([
       {
         $match: { author: new ObjectId(authorId || "") },
@@ -62,7 +62,10 @@ async function getPosts(req: NextRequest) {
       },
     ]).sort({ createdAt: -1 });
 
-    const postsDataResponse = { data: posts, count: posts ? posts.length : 0 };
+    const postsDataResponse = {
+      data: posts,
+      count: posts ? posts.length : 0,
+    };
 
     return NextResponse.json(postsDataResponse, {
       status: 200,
