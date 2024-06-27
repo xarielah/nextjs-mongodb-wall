@@ -22,9 +22,10 @@ async function getWallPosts(
       return NextResponse.json({ message: "Wall not found" }, { status: 404 });
     }
 
-    const sharedWith = foundWall.sharedWith.map((email: string) =>
+    const sharedWith = foundWall.privacy.sharedWith.map((email: string) =>
       email.toLowerCase()
     );
+
     console.log(sharedWith.indexOf(requestorEmail) === -1);
     if (sharedWith.indexOf(requestorEmail) === -1 && !foundWall.shareWithAll) {
       return NextResponse.json(

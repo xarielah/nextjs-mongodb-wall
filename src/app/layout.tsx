@@ -9,7 +9,6 @@ const font = Roboto({ weight: "400", subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "The Wall",
   description: "Your own personal shareable temporary notes wall app.",
-  viewport: "width=device-width, initial-scale=1",
   authors: {
     name: "Ariel Aharon",
     url: "https://xarielah.dev",

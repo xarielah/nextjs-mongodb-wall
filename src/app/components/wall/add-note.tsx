@@ -104,7 +104,7 @@ export default function AddNote({
         className={`input ${direction === "rtl" ? "text-right " : ""}`}
         placeholder="Add what you need."
       />
-      <div className="flex justify-between items-center w-full">
+      <div className="flex justify-between items-center w-full md:fled-row flex-col">
         <menu className="flex items-center gap-6 text-zinc-300 text-sm">
           <li
             role="button"
