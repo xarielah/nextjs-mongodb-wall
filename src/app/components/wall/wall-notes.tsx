@@ -38,7 +38,7 @@ export default function WallNotes({
       return console.error("removeNoteFromWall is not defined");
     const oldContent = [...data];
     removeNoteFromWall(id);
-    fetch(`/api/wall/${id}`, { method: "DELETE" })
+    fetch(`/api/wall/post/${id}`, { method: "DELETE" })
       .then((res) => {
         if (!res.ok) {
           // reset back content;
