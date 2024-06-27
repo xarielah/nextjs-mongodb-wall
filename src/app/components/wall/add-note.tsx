@@ -69,7 +69,9 @@ export default function AddNote({
         if (res.ok) {
           const response = await res.json();
           const wallPost = {
-            author: session?.user?.name || "N/A",
+            author: [
+              { name: session?.user?.name, image: session?.user?.image },
+            ],
             createdAt: new Date().toISOString(),
             content: content,
             isPublic: isPublic,

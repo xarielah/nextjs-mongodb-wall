@@ -12,6 +12,7 @@
     "@auth/mongodb-adapter": "^3.3.0",
     "bcryptjs": "^2.4.3",
     "jose": "^5.4.1",
+    "moment": "^2.30.1",
     "mongodb": "^6.7.0",
     "mongoose": "^8.4.3",
     "next": "14.2.4",
