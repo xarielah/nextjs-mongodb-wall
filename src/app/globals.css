@@ -21,3 +21,7 @@
 .hover-white-element {
   @apply hover:text-zinc-100 text-zinc-400;
 }
+
+.setting-property-wrapper {
+  @apply flex justify-between text-zinc-400 items-center w-full;
+}

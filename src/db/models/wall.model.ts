@@ -7,13 +7,25 @@ const WallSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
-    shareWithAll: {
-      type: Boolean,
-      default: false,
+    privacy: {
+      shareWithAll: {
+        type: Boolean,
+        default: false,
+      },
+      sharedWith: {
+        type: [String],
+        default: [],
+      },
     },
-    sharedWith: {
-      type: [String],
-      default: [],
+    preferences: {
+      defaultRTL: {
+        type: Boolean,
+        default: false,
+      },
+      defaultPublic: {
+        type: Boolean,
+        default: false,
+      },
     },
   },
   { timestamps: true }
