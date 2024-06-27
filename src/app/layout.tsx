@@ -7,8 +7,14 @@ import "./globals.css";
 const font = Roboto({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Wall",
-  description: "Your own personal notes wall app.",
+  title: "The Wall",
+  description: "Your own personal shareable temporary notes wall app.",
+  viewport: "width=device-width, initial-scale=1",
+  authors: {
+    name: "Ariel Aharon",
+    url: "https://xarielah.dev",
+  },
+  keywords: ["wall", "notes", "share", "temporary", "nextjs"],
 };
 
 export default function RootLayout({
