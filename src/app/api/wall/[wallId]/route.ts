@@ -13,6 +13,7 @@ async function getWallPosts(
       return NextResponse.json({ message: "Invalid wall id" }, { status: 400 });
     }
 
+    const requestorId = req.headers.get("x-middleware-userid");
     const requestorEmail = req.headers.get("x-middleware-useremail") || "";
 
     await connectMongo();
@@ -26,8 +27,11 @@ async function getWallPosts(
       email.toLowerCase()
     );
 
-    console.log(sharedWith.indexOf(requestorEmail) === -1);
-    if (sharedWith.indexOf(requestorEmail) === -1 && !foundWall.shareWithAll) {
+    if (
+      sharedWith.indexOf(requestorEmail) === -1 &&
+      !foundWall.shareWithAll &&
+      !foundWall.user.equals(requestorId)
+    ) {
       return NextResponse.json(
         { message: "Unauthorized to view the wall" },
         { status: 401 }
@@ -68,7 +72,11 @@ async function getWallPosts(
       createdAt: -1,
     });
 
-    const postsDataResponse = { data: posts, count: posts ? posts.length : 0 };
+    const postsDataResponse = {
+      data: posts,
+      count: posts ? posts.length : 0,
+      requestorIsOwner: foundWall.user.equals(requestorId),
+    };
 
     return NextResponse.json(postsDataResponse, { status: 200 });
   } catch (error) {

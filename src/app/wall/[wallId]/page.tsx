@@ -1,5 +1,6 @@
 "use client";
 
+import SupBadge from "@/app/components/sup-badge";
 import WallNotes, { PostType } from "@/app/components/wall/wall-notes";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -13,6 +14,9 @@ export default function UserWallPage({
 }: {
   params: { wallId: string };
 }) {
+  const [loadingWall, setLoadingWall] = useState<boolean>(true);
+  const [requestorIsOwner, setRequestorIsOwner] = useState<boolean>(false);
+
   const [wallNotes, setWallNotes] = useState<PostType[]>([]);
   const [wallOwner, setWallOwner] = useState<{
     name: string;
@@ -25,6 +29,7 @@ export default function UserWallPage({
       .then((res) => {
         if (res.count) {
           setWallNotes(res.data);
+          setRequestorIsOwner(res.requestorIsOwner || false);
 
           const wallOwner = {
             name: res.data[0].author[0].name,
@@ -51,7 +56,14 @@ export default function UserWallPage({
             👋
           </div>
         )}
-        <h1 className="text-3xl">{wallOwner ? wallOwner.name : "Anonymous"}</h1>
+        <h1 className="text-3xl">
+          {wallOwner ? wallOwner.name : "Anonymous"}{" "}
+          {requestorIsOwner ? (
+            <SupBadge className="bg-blue-950">You</SupBadge>
+          ) : (
+            ""
+          )}
+        </h1>
       </div>
 
       <WallNotes
