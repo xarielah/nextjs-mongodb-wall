@@ -51,13 +51,13 @@ export default function EmailsPermitted({
 
   return (
     <section>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 md:flex-row flex-col gap-3 md:gap-0">
         <input
           disabled={disabled}
           value={addEmail}
           onChange={(e) => setAddEmail(e.target.value.trim())}
           type="email"
-          placeholder="Add an email address to access your wall"
+          placeholder="Add email address to permit"
           className="input"
           onKeyDown={(e) => e.key === "Enter" && handleAddEmailSubmittion()}
         />

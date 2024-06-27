@@ -20,7 +20,7 @@ export default function Header() {
     >
       {pathname !== "/" ? (
         <Link href="/" className="text-sm text-zinc-500">
-          ← Go to your wall
+          ← Back to wall
         </Link>
       ) : (
         ""
