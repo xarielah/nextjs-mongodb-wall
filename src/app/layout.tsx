@@ -33,7 +33,9 @@ export default function RootLayout({
           <div className="w-full max-w-3xl space-y-10 pt-16 flex flex-col mx-auto">
             <Header />
             {children}
-            <footer className="container-bg text-sm">Test &copy;</footer>
+            <footer className="text-zinc-500 text-sm p-4">
+              The Wall &copy; {new Date().getFullYear()}
+            </footer>
           </div>
         </body>
       </html>
