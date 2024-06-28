@@ -1,5 +1,4 @@
 import { Alert } from "@/app/hooks/use-alerts";
-import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 
 interface IAlertComponent {
@@ -9,7 +8,7 @@ interface IAlertComponent {
 export default function AlertComponent({ alerts }: IAlertComponent) {
   return (
     <div id="alert-component">
-      <div className="">
+      <div className="space-y-2">
         {alerts.map((alert) => (
           <SingleAlert key={alert.id} alert={alert} />
         ))}
@@ -47,24 +46,4 @@ function SingleAlert({ alert }: { alert: Alert }) {
       </p>
     </article>
   );
-}
-
-function ShowTimer({ alert }: { alert: Alert }) {
-  const [time, setTime] = useState<number>(alert.ttl || 0);
-
-  useEffect(() => {
-    if (time === 0) return alert.removeAlert();
-    let to: NodeJS.Timeout | null = null;
-    if (alert.showTimer) {
-      to = setInterval(() => {
-        setTime(time - 1);
-      }, 1000);
-    }
-
-    return () => {
-      to && clearInterval(to);
-    };
-  }, [time]);
-
-  return <div>Closing in {time}s...</div>;
 }

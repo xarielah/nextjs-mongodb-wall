@@ -1,20 +1,26 @@
 "use client";
-import { useState } from "react";
+import { AddAlert } from "@/app/hooks/use-alerts";
+import * as emailValidator from "email-validator";
+import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 
 interface IEmailsPermitted {
   disabled?: boolean;
   fetchedValue: string[];
   wallId: string;
+  addAlert: AddAlert;
 }
 
 export default function EmailsPermitted({
   disabled,
   fetchedValue,
   wallId,
+  addAlert,
 }: IEmailsPermitted) {
   const [addEmail, setAddEmail] = useState<string>("");
   const [emailsPerm, setEmailsPerm] = useState<string[]>([...fetchedValue]);
+
+  const [emailOkay, setEmailOkay] = useState<boolean>(false);
 
   const handleEmailRemove = (email: string) => {
     const oldValues = [...emailsPerm];
@@ -36,26 +42,51 @@ export default function EmailsPermitted({
 
   const handleAddEmailSubmittion = () => {
     const oldValues = [...emailsPerm];
+    const addEmailCached = addEmail;
     setEmailsPerm((prev) => [addEmail.toLowerCase(), ...prev]);
     setAddEmail("");
 
     fetch(`/api/wall/${wallId}/email`, {
       method: "POST",
       body: JSON.stringify({ email: addEmail }),
-    }).then((res) => {
-      if (!res.ok) {
+    })
+      .then((res) => {
+        if (!res.ok) {
+          setEmailsPerm(oldValues);
+          addAlert({
+            message: `Failed to add \"${addEmailCached}\" to permitted list`,
+            type: "error",
+            ttl: 10,
+            toast: false,
+          });
+        }
+      })
+      .catch(() => {
         setEmailsPerm(oldValues);
-      }
-    });
+        addAlert({
+          message: `Failed to add ${addEmailCached} to permitted list`,
+          type: "error",
+          ttl: 10,
+          toast: false,
+        });
+      });
   };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAddEmail(e.target.value.trim());
+  };
+
+  useEffect(() => {
+    setEmailOkay(emailValidator.validate(addEmail));
+  }, [addEmail]);
 
   return (
     <section>
-      <div className="flex items-center gap-4 md:flex-row flex-col gap-3 md:gap-0">
+      <div className="flex items-center md:flex-row flex-col gap-3 md:gap-0">
         <input
           disabled={disabled}
           value={addEmail}
-          onChange={(e) => setAddEmail(e.target.value.trim())}
+          onChange={handleEmailChange}
           type="email"
           placeholder="Add email address to permit"
           className="input"
@@ -63,7 +94,7 @@ export default function EmailsPermitted({
         />
         <button
           className="button whitespace-nowrap"
-          disabled={!addEmail}
+          disabled={!addEmail || !emailOkay}
           onClick={handleAddEmailSubmittion}
         >
           Add Email

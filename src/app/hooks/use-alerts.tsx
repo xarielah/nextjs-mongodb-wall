@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type Alert = {
   id: number;
@@ -13,20 +13,30 @@ export type Alert = {
   toast?: boolean;
 };
 
+export type AlertOptions = Pick<
+  Alert,
+  "message" | "type" | "showTimer" | "ttl" | "closeable" | "toast"
+>;
+
+export type AddAlert = (alertOptions: AlertOptions) => void;
+
 export default function useAlerts() {
   const [data, setData] = useState<Alert[]>([]);
+  const [timeouts, setTimeouts] = useState<NodeJS.Timeout[]>([]);
 
-  const addAlert = (
-    alertOptions: Pick<
-      Alert,
-      "message" | "type" | "showTimer" | "ttl" | "closeable" | "toast"
-    >
-  ) => {
+  useEffect(() => {
+    return () => {
+      timeouts.forEach((to) => clearTimeout(to));
+    };
+  }, [timeouts]);
+
+  const addAlert = (alertOptions: AlertOptions) => {
     const id = data.length + 1;
 
     let to: NodeJS.Timeout | null = null;
     if (alertOptions.ttl) {
-      setTimeout(() => removeAlert(id), alertOptions.ttl * 1000);
+      const to = setTimeout(() => removeAlert(id), alertOptions.ttl * 1000);
+      setTimeouts([...timeouts, to]);
     }
 
     const newAlert: Alert = {

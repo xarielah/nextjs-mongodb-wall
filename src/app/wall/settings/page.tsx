@@ -4,8 +4,9 @@ import AlertComponent from "@/app/components/alerts/alert-component";
 import EmailsPermitted from "@/app/components/settings/emails-permitted";
 import ToggleSwitch from "@/app/components/toggle-switch";
 import LoadingSession from "@/app/components/wall/loading-session";
-import useAlerts from "@/app/hooks/use-alerts";
+import useAlerts, { AlertOptions } from "@/app/hooks/use-alerts";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type UserSettings = {
@@ -16,7 +17,7 @@ type UserSettings = {
 };
 export default function SettingsPage() {
   const [loading, setLoading] = useState<boolean>(true);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const [wallId, setWallId] = useState<string>("");
 
@@ -33,14 +34,22 @@ export default function SettingsPage() {
 
   const { alerts, addAlert } = useAlerts();
 
+  const router = useRouter();
   useEffect(() => {
-    // Fetch preferences from the server
-    if (session && session?.user?.wallId) {
+    // Redirect to home if unauthenticated
+    if (status === "unauthenticated") {
+      router.replace("/");
+    }
+    // Fetch preferences from the server if user authenticated
+    else if (status === "authenticated" && session?.user?.wallId) {
       setWallId(session.user.wallId);
 
       fetch(`/api/wall/${session.user.wallId}/settings`)
         .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch");
+          if (!res.ok) {
+            setLoading(false);
+            throw new Error("Failed to fetch");
+          }
           return res.json();
         })
         .then((res) => {
@@ -67,7 +76,7 @@ export default function SettingsPage() {
           setDefaults({ defaultRTL, defaultPublic, shareWithAll });
         });
     }
-  }, [session?.user.wallId]);
+  }, [session?.user.wallId, status]);
 
   useEffect(() => {
     if (loading || Object.keys(defaults).length === 0) return;
@@ -124,7 +133,7 @@ export default function SettingsPage() {
             <h3 className="mb-4 text-2xl">Privacy</h3>
             <div className="w-full flex items-center flex-col gap-4">
               <div className="setting-property-wrapper">
-                <label htmlFor="share-with-all">
+                <label htmlFor="share-with-all" className="settings-label">
                   Share with all{" "}
                   <sup className="text-green-400 px-1">
                     (public for everyone)
@@ -142,7 +151,7 @@ export default function SettingsPage() {
             <h3 className="mb-4 text-2xl">Wall</h3>
             <div className="w-full flex items-center flex-col gap-4">
               <div className="setting-property-wrapper">
-                <label htmlFor="default-rtl">
+                <label htmlFor="default-rtl" className="settings-label">
                   Default RTL <sup className="px-1">(Right-to-left)</sup>
                 </label>
                 <ToggleSwitch
@@ -153,7 +162,9 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="setting-property-wrapper">
-                <label htmlFor="default-public">Default Public</label>
+                <label htmlFor="default-public" className="settings-label">
+                  Default Public
+                </label>
                 <ToggleSwitch
                   disabled={updatingPref}
                   id="default-public"
@@ -175,7 +186,11 @@ export default function SettingsPage() {
         </div>
 
         {!shareWithAll ? (
-          <EmailsPermitted wallId={wallId} fetchedValue={[...fetchedEmails]} />
+          <EmailsPermitted
+            addAlert={(alertOptions: AlertOptions) => addAlert(alertOptions)}
+            wallId={wallId}
+            fetchedValue={[...fetchedEmails]}
+          />
         ) : (
           ""
         )}
