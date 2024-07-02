@@ -29,7 +29,7 @@ async function getWallPosts(
 
     if (
       sharedWith.indexOf(requestorEmail) === -1 &&
-      !foundWall.shareWithAll &&
+      !foundWall.privacy.shareWithAll &&
       !foundWall.user.equals(requestorId)
     ) {
       return NextResponse.json(
