@@ -1,4 +1,5 @@
 import { Wall } from "@/db/models/wall.model";
+import connectMongo from "@/db/utils/connect-mongo.db";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import { AuthOptions } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
@@ -56,7 +57,7 @@ export const authOptions: AuthOptions = {
 
     async session(params) {
       const userId = params.user.id as string;
-
+      await connectMongo();
       let wall = await Wall.findOne({ user: userId });
       if (!wall) {
         wall = (await Wall.create({ user: userId })) as Awaited<WallObject>;
