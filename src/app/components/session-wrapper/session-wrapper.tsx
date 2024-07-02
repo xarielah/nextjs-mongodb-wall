@@ -9,7 +9,6 @@ export default function SessionWrapper({
   children: React.ReactNode;
   session: string;
 }) {
-  console.log("🚀 ~ session:", session);
   return (
     <SessionProvider
       session={JSON.parse(session)}

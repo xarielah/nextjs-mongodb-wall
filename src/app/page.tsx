@@ -28,7 +28,6 @@ export default function Home() {
   }, [status]);
 
   const addNoteToWall = (note: any) => {
-    console.log("🚀 ~ addNoteToWall ~ note:", note);
     setWallNotes((prev: any) => [note, ...prev]);
   };
 

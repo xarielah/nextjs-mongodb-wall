@@ -49,9 +49,7 @@ export default function SettingsPage() {
     if (status === "authenticated" && session?.user?.wallId) {
       setWallId(session.user.wallId);
       const pref = session.user.settings!.preferences || {};
-      console.log("🚀 ~ useEffect ~ pref:", pref);
       const privacy = session.user.settings!.privacy || {};
-      console.log("🚀 ~ useEffect ~ privacy:", privacy);
 
       const defaultFetchedSettings = defaults;
 
@@ -73,37 +71,6 @@ export default function SettingsPage() {
         defaultPublic: settings.defaultPublic,
         shareWithAll: settings.shareWithAll,
       });
-      // fetch(`/api/wall/${session.user.wallId}/settings`)
-      //   .then((res) => {
-      //     if (!res.ok) {
-      //       setLoading(false);
-      //       throw new Error("Failed to fetch");
-      //     }
-      //     return res.json();
-      //   })
-      //   .then((res) => {
-      //     const pref = res.preferences || {};
-      //     const privacy = res.privacy || {};
-
-      //     const defaultFetchedSettings = defaults;
-
-      //     // Wall settings
-      //     setDefaultRTL(pref.defaultRTL || false);
-      //     defaultFetchedSettings.defaultRTL = pref.defaultRTL || false;
-      //     setDefaultPublic(pref.defaultPublic || false);
-      //     defaultFetchedSettings.defaultPublic = pref.defaultPublic || false;
-
-      //     // Privacy settings
-      //     setFetchedEmails(privacy.sharedWith || []);
-      //     setShareWithAll(privacy.shareWithAll || false);
-      //     defaultFetchedSettings.shareWithAll = privacy.shareWithAll || false;
-
-      //     setDefaults(defaultFetchedSettings);
-      //   })
-      //   .finally(() => {
-      //     setLoading(false);
-      //     setDefaults({ defaultRTL, defaultPublic, shareWithAll });
-      //   });
     }
   }, [session?.user.wallId, status]);
 
@@ -119,7 +86,7 @@ export default function SettingsPage() {
     } else {
       setFormDirty(false);
     }
-  }, [settings]);
+  }, [settings, status]);
 
   const handleSavedChanges = () => {
     setUpdatingPref(true);

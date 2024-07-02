@@ -3,6 +3,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { CiLogin, CiLogout } from "react-icons/ci";
 import { PiGearSix } from "react-icons/pi";
 import { CopyButton } from "./copy-button";
@@ -53,7 +54,14 @@ export default function Header() {
 }
 
 function OptionsForLoggedUsers({ wallId }: { wallId: string }) {
-  let windowLoc = typeof window !== undefined ? window.location.origin : "";
+  const [windowLoc, setWindowLoc] = useState<string>("");
+
+  useEffect(() => {
+    if (window) {
+      setWindowLoc(window.location.origin);
+    }
+  }, []);
+
   return (
     <menu className="text-zinc-500 text-2xl flex items-center gap-6">
       <li role="button" className="hover-white-element">

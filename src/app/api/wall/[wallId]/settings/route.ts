@@ -3,36 +3,6 @@ import connectMongo from "@/db/utils/connect-mongo.db";
 import { ObjectId } from "mongodb";
 import { NextRequest, NextResponse } from "next/server";
 
-async function getWallSettings(
-  req: NextRequest,
-  { params: { wallId } }: { params: { wallId: string } }
-) {
-  try {
-    if (!wallId || !ObjectId.isValid(wallId)) {
-      return NextResponse.json({ message: "Invalid wall id" }, { status: 400 });
-    }
-
-    await connectMongo();
-    const foundWall = await Wall.findById(wallId, {
-      preferences: 1,
-      _id: 1,
-      privacy: 1,
-    });
-
-    if (foundWall === null) {
-      return NextResponse.json({ message: "Wall not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(foundWall, { status: 200 });
-  } catch (error) {
-    console.log("🚀 ~ error:", error);
-    return NextResponse.json(
-      { message: "Error fetching posts" },
-      { status: 500 }
-    );
-  }
-}
-
 async function updateWallSettings(
   req: NextRequest,
   { params: { wallId } }: { params: { wallId: string } }
@@ -85,4 +55,4 @@ async function updateWallSettings(
   }
 }
 
-export { getWallSettings as GET, updateWallSettings as PUT };
+export { updateWallSettings as PUT };
