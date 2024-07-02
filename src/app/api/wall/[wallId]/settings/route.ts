@@ -68,10 +68,16 @@ async function updateWallSettings(
       foundWall.preferences.defaultPublic = defaultPublic;
     }
 
-    await foundWall.save();
+    const updatedSettingsRecord = await foundWall.save();
 
     return NextResponse.json(
-      { message: `Wall settings updated for wall id ${wallId}` },
+      {
+        message: `Wall settings updated for wall id ${wallId}`,
+        updatedSettings: {
+          preferences: updatedSettingsRecord.preferences,
+          privacy: updatedSettingsRecord.privacy,
+        },
+      },
       { status: 200 }
     );
   } catch (error) {

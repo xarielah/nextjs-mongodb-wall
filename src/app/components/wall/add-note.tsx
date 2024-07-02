@@ -1,35 +1,25 @@
 "use client";
 
+import { Settings } from "@/lib/auth-options";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { FaLock, FaLockOpen, FaLongArrowAltRight } from "react-icons/fa";
-import LoadingSession from "./loading-session";
 
-export default function AddNote({
-  addNoteToWall,
-}: {
+interface IAddNote {
   addNoteToWall: (note: any) => void;
-}) {
+  settings: Settings;
+}
+
+export default function AddNote({ addNoteToWall, settings }: IAddNote) {
   const { data: session } = useSession();
 
   const [text, setText] = useState<string>("");
-  const [isPublic, setIsPublic] = useState<boolean>(false);
-  const [direction, setDirection] = useState<"ltr" | "rtl">("ltr");
-
-  const [loadingPref, setLoadingPref] = useState<boolean>(true);
-
-  useEffect(() => {
-    if (session?.user?.wallId) {
-      fetch(`/api/wall/${session.user.wallId}/settings`)
-        .then((res) => res.json())
-        .then((res) => {
-          const pref = res.preferences || {};
-          setDirection(pref.defaultRTL ? "rtl" : "ltr");
-          setIsPublic(pref.defaultPublic || false);
-        })
-        .finally(() => setLoadingPref(false));
-    }
-  }, []);
+  const [isPublic, setIsPublic] = useState<boolean>(
+    settings.preferences.defaultPublic
+  );
+  const [direction, setDirection] = useState<"ltr" | "rtl">(
+    settings.preferences.defaultRTL ? "rtl" : "ltr"
+  );
 
   const toggleDirection = () => {
     setDirection(direction === "ltr" ? "rtl" : "ltr");
@@ -94,7 +84,6 @@ export default function AddNote({
       });
   };
 
-  if (loadingPref) return <LoadingSession />;
   return (
     <div className="container-bg mb-16 flex flex-col gap-2 items-start">
       <EditorOptions

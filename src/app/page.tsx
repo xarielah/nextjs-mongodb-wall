@@ -8,15 +8,12 @@ import NotLoggedIn from "./components/wall/not-logged-in";
 import WallNotes, { PostType } from "./components/wall/wall-notes";
 
 export default function Home() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [wallNotes, setWallNotes] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const loadingSession = session === undefined;
-  const loggedIn = session && session?.user;
-
   useEffect(() => {
-    if (!loggedIn) return;
+    if (status !== "authenticated") return;
     setLoading(true);
     fetch("/api/wall")
       .then((res) => res.json())
@@ -28,7 +25,7 @@ export default function Home() {
       .finally(() => {
         setLoading(false);
       });
-  }, [loggedIn]);
+  }, [status]);
 
   const addNoteToWall = (note: any) => {
     console.log("🚀 ~ addNoteToWall ~ note:", note);
@@ -39,12 +36,15 @@ export default function Home() {
     setWallNotes((prev: any) => prev.filter((note: any) => note._id !== id));
   };
 
-  if (loadingSession) return <LoadingSession />;
-  if (!loggedIn) return <NotLoggedIn />;
+  if (status === "loading") return <LoadingSession />;
+  if (status === "unauthenticated") return <NotLoggedIn />;
   if (loading) return <LoadingNotes />;
   return (
     <main className="space-y-4">
-      <AddNote addNoteToWall={addNoteToWall} />
+      <AddNote
+        settings={session?.user.settings!}
+        addNoteToWall={addNoteToWall}
+      />
       <section className="p-2 w-full space-y-6">
         <WallNotes
           setWallNotes={(notes: PostType[]) => setWallNotes(notes)}

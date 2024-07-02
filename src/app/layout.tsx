@@ -1,4 +1,6 @@
+import { authOptions } from "@/lib/auth-options";
 import type { Metadata } from "next";
+import { getServerSession } from "next-auth";
 import { Roboto } from "next/font/google";
 import Header from "./components/header";
 import SessionWrapper from "./components/session-wrapper/session-wrapper";
@@ -16,13 +18,14 @@ export const metadata: Metadata = {
   keywords: ["wall", "notes", "share", "temporary", "nextjs"],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
   return (
-    <SessionWrapper>
+    <SessionWrapper session={JSON.stringify(session)}>
       <html lang="en">
         <body
           className={

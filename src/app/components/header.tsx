@@ -53,7 +53,7 @@ export default function Header() {
 }
 
 function OptionsForLoggedUsers({ wallId }: { wallId: string }) {
-  const windowLoc = window ? window.location.origin : "";
+  let windowLoc = typeof window !== undefined ? window.location.origin : "";
   return (
     <menu className="text-zinc-500 text-2xl flex items-center gap-6">
       <li role="button" className="hover-white-element">

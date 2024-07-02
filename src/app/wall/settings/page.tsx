@@ -5,9 +5,10 @@ import EmailsPermitted from "@/app/components/settings/emails-permitted";
 import ToggleSwitch from "@/app/components/toggle-switch";
 import LoadingSession from "@/app/components/wall/loading-session";
 import useAlerts, { AlertOptions } from "@/app/hooks/use-alerts";
+import { Settings } from "@/lib/auth-options";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 
 type UserSettings = {
   defaultRTL: boolean;
@@ -16,80 +17,109 @@ type UserSettings = {
   sharedWith: string[];
 };
 export default function SettingsPage() {
-  const [loading, setLoading] = useState<boolean>(true);
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
+  console.log("🚀 ~ SettingsPage ~ status:", status);
 
   const [wallId, setWallId] = useState<string>("");
 
   const [fetchedEmails, setFetchedEmails] = useState<string[]>([]);
 
-  const [shareWithAll, setShareWithAll] = useState<boolean>(false);
-  const [defaultRTL, setDefaultRTL] = useState<boolean>(false);
-  const [defaultPublic, setDefaultPublic] = useState<boolean>(false);
+  const [settings, setSettings] = useState<Partial<UserSettings>>({});
 
   const [updatingPref, setUpdatingPref] = useState<boolean>(false);
 
   const [formDirty, setFormDirty] = useState<boolean>(false);
+  console.log("🚀 ~ SettingsPage ~ formDirty:", formDirty);
   const [defaults, setDefaults] = useState<Partial<UserSettings>>({});
 
   const { alerts, addAlert } = useAlerts();
 
+  const updateField = (field: keyof UserSettings, value: boolean) => {
+    setSettings((prev) => ({ ...prev, [field]: value }));
+  };
+
   const router = useRouter();
-  useEffect(() => {
+  useLayoutEffect(() => {
     // Redirect to home if unauthenticated
-    if (status === "unauthenticated") {
-      router.replace("/");
-    }
-    // Fetch preferences from the server if user authenticated
-    else if (status === "authenticated" && session?.user?.wallId) {
+    // if (status === "unauthenticated") {
+    //   router.replace("/");
+    // }
+    // // Fetch preferences from the server if user authenticated
+    // else
+    if (status === "authenticated" && session?.user?.wallId) {
       setWallId(session.user.wallId);
+      const pref = session.user.settings!.preferences || {};
+      console.log("🚀 ~ useEffect ~ pref:", pref);
+      const privacy = session.user.settings!.privacy || {};
+      console.log("🚀 ~ useEffect ~ privacy:", privacy);
 
-      fetch(`/api/wall/${session.user.wallId}/settings`)
-        .then((res) => {
-          if (!res.ok) {
-            setLoading(false);
-            throw new Error("Failed to fetch");
-          }
-          return res.json();
-        })
-        .then((res) => {
-          const pref = res.preferences || {};
-          const privacy = res.privacy || {};
+      const defaultFetchedSettings = defaults;
 
-          const defaultFetchedSettings = defaults;
+      // Wall settings
+      updateField("defaultRTL", pref.defaultRTL || false);
+      defaultFetchedSettings.defaultRTL = pref.defaultRTL || false;
+      updateField("defaultPublic", pref.defaultPublic || false);
+      defaultFetchedSettings.defaultPublic = pref.defaultPublic || false;
 
-          // Wall settings
-          setDefaultRTL(pref.defaultRTL || false);
-          defaultFetchedSettings.defaultRTL = pref.defaultRTL || false;
-          setDefaultPublic(pref.defaultPublic || false);
-          defaultFetchedSettings.defaultPublic = pref.defaultPublic || false;
+      // Privacy settings
+      setFetchedEmails(privacy.sharedWith || []);
+      updateField("shareWithAll", privacy.shareWithAll || false);
+      defaultFetchedSettings.shareWithAll = privacy.shareWithAll || false;
 
-          // Privacy settings
-          setFetchedEmails(privacy.sharedWith || []);
-          setShareWithAll(privacy.shareWithAll || false);
-          defaultFetchedSettings.shareWithAll = privacy.shareWithAll || false;
+      setDefaults(defaultFetchedSettings);
 
-          setDefaults(defaultFetchedSettings);
-        })
-        .finally(() => {
-          setLoading(false);
-          setDefaults({ defaultRTL, defaultPublic, shareWithAll });
-        });
+      setDefaults({
+        defaultRTL: settings.defaultRTL,
+        defaultPublic: settings.defaultPublic,
+        shareWithAll: settings.shareWithAll,
+      });
+      // fetch(`/api/wall/${session.user.wallId}/settings`)
+      //   .then((res) => {
+      //     if (!res.ok) {
+      //       setLoading(false);
+      //       throw new Error("Failed to fetch");
+      //     }
+      //     return res.json();
+      //   })
+      //   .then((res) => {
+      //     const pref = res.preferences || {};
+      //     const privacy = res.privacy || {};
+
+      //     const defaultFetchedSettings = defaults;
+
+      //     // Wall settings
+      //     setDefaultRTL(pref.defaultRTL || false);
+      //     defaultFetchedSettings.defaultRTL = pref.defaultRTL || false;
+      //     setDefaultPublic(pref.defaultPublic || false);
+      //     defaultFetchedSettings.defaultPublic = pref.defaultPublic || false;
+
+      //     // Privacy settings
+      //     setFetchedEmails(privacy.sharedWith || []);
+      //     setShareWithAll(privacy.shareWithAll || false);
+      //     defaultFetchedSettings.shareWithAll = privacy.shareWithAll || false;
+
+      //     setDefaults(defaultFetchedSettings);
+      //   })
+      //   .finally(() => {
+      //     setLoading(false);
+      //     setDefaults({ defaultRTL, defaultPublic, shareWithAll });
+      //   });
     }
   }, [session?.user.wallId, status]);
 
   useEffect(() => {
-    if (loading || Object.keys(defaults).length === 0) return;
+    if (status !== "authenticated" || Object.keys(defaults).length === 0)
+      return;
     if (
-      defaultRTL !== defaults.defaultRTL ||
-      defaultPublic !== defaults.defaultPublic ||
-      shareWithAll !== defaults.shareWithAll
+      settings.defaultRTL !== defaults.defaultRTL ||
+      settings.defaultPublic !== defaults.defaultPublic ||
+      settings.shareWithAll !== defaults.shareWithAll
     ) {
       setFormDirty(true);
     } else {
       setFormDirty(false);
     }
-  }, [defaultRTL, defaultPublic, shareWithAll]);
+  }, [settings]);
 
   const handleSavedChanges = () => {
     setUpdatingPref(true);
@@ -98,11 +128,11 @@ export default function SettingsPage() {
       method: "PUT",
       body: JSON.stringify({
         preferences: {
-          defaultRTL,
-          defaultPublic,
+          defaultRTL: settings.defaultRTL,
+          defaultPublic: settings.defaultPublic,
         },
         privacy: {
-          shareWithAll,
+          shareWithAll: settings.shareWithAll,
         },
       }),
     })
@@ -116,12 +146,18 @@ export default function SettingsPage() {
           ttl: 7,
           toast: true,
         });
+        return res.json();
+      })
+      .then((res) => {
+        const newSession = { ...session };
+        newSession.user!.settings = res.updatedSettings as Settings;
+        update(newSession);
       })
       .catch(console.error)
       .finally(() => setUpdatingPref(false));
   };
 
-  if (loading) return <LoadingSession />;
+  if (status === "loading") return <LoadingSession />;
   return (
     <>
       <AlertComponent alerts={alerts} />
@@ -141,8 +177,8 @@ export default function SettingsPage() {
                 </label>
                 <ToggleSwitch
                   id="share-with-all"
-                  value={shareWithAll}
-                  setValue={(value) => setShareWithAll(value)}
+                  value={settings.shareWithAll || false}
+                  setValue={(value) => updateField("shareWithAll", value)}
                 />
               </div>
             </div>
@@ -157,8 +193,8 @@ export default function SettingsPage() {
                 <ToggleSwitch
                   disabled={updatingPref}
                   id="default-rtl"
-                  value={defaultRTL}
-                  setValue={(value) => setDefaultRTL(value)}
+                  value={settings.defaultRTL || false}
+                  setValue={(value) => updateField("defaultRTL", value)}
                 />
               </div>
               <div className="setting-property-wrapper">
@@ -168,8 +204,8 @@ export default function SettingsPage() {
                 <ToggleSwitch
                   disabled={updatingPref}
                   id="default-public"
-                  value={defaultPublic}
-                  setValue={(value) => setDefaultPublic(value)}
+                  value={settings.defaultPublic || false}
+                  setValue={(value) => updateField("defaultPublic", value)}
                 />
               </div>
             </div>
@@ -185,7 +221,7 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {!shareWithAll ? (
+        {!settings.shareWithAll ? (
           <EmailsPermitted
             addAlert={(alertOptions: AlertOptions) => addAlert(alertOptions)}
             wallId={wallId}

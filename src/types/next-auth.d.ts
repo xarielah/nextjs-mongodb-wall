@@ -1,3 +1,4 @@
+import { Settings } from "@/lib/auth-options";
 import "next-auth";
 
 declare module "next-auth" {
@@ -13,6 +14,7 @@ declare module "next-auth" {
       image?: string;
       emailVerified?: string;
       id?: string;
+      settings?: Settings;
     };
     expires: string;
   }
